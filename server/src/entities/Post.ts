@@ -4,52 +4,52 @@ import {
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
-  PrimaryGeneratedColumn,
-} from "typeorm";
-import { Field, ObjectType } from "type-graphql";
-import { User } from "./User";
-import { Comment } from "./Comment";
+  PrimaryGeneratedColumn
+} from 'typeorm'
+import { Field, ObjectType } from 'type-graphql'
+import { User } from './User'
+import { Comment } from './Comment'
 
 @ObjectType()
 @Entity()
 export class Post extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: number
 
   @Field()
   @Column()
-  owner!: User;
+  owner!: User
 
   @Field()
-  @Column({ type: "text" })
-  title!: string;
+  @Column({ type: 'text' })
+  title!: string
 
   @Field()
-  @Column({ type: "text" })
-  content!: string;
-
-  @Field()
-  @Column()
-  tags?: string[];
+  @Column({ type: 'text' })
+  content!: string
 
   @Field()
   @Column()
-  upVotes?: User[];
+  tags?: string[]
 
   @Field()
   @Column()
-  downVotes?: User[];
+  upVotes?: User[]
 
   @Field()
   @Column()
-  comments?: Comment[];
+  downVotes?: User[]
+
+  @Field()
+  @Column()
+  comments?: Comment[]
 
   @Field(() => String)
   @CreateDateColumn()
-  createdAt?: Date = new Date();
+  createdAt?: Date = new Date()
 
   @Field(() => String)
   @UpdateDateColumn()
-  updatedAt?: Date = new Date();
+  updatedAt?: Date = new Date()
 }

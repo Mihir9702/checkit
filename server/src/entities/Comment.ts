@@ -1,51 +1,52 @@
+/* eslint-disable no-use-before-define */
 import {
   Column,
   Entity,
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
-  PrimaryGeneratedColumn,
-} from "typeorm";
-import { Field, ObjectType } from "type-graphql";
-import { User } from "./User";
-import { Post } from "./Post";
+  PrimaryGeneratedColumn
+} from 'typeorm'
+import { Field, ObjectType } from 'type-graphql'
+import { User } from './User'
+import { Post } from './Post'
 
 @ObjectType()
 @Entity()
 export class Comment extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: number
 
   @Field()
-  @Column({ type: "text" })
-  text!: string;
-
-  @Field()
-  @Column()
-  owner!: User;
+  @Column({ type: 'text' })
+  text!: string
 
   @Field()
   @Column()
-  post!: Post;
+  owner!: User
 
   @Field()
   @Column()
-  upVotes!: User[];
+  post!: Post
 
   @Field()
   @Column()
-  downVotes!: User[];
+  upVotes!: User[]
 
   @Field()
   @Column()
-  comments?: Comment[];
+  downVotes!: User[]
+
+  @Field()
+  @Column()
+  comments?: Comment[]
 
   @Field(() => String)
   @CreateDateColumn()
-  createdAt?: Date = new Date();
+  createdAt?: Date = new Date()
 
   @Field(() => String)
   @UpdateDateColumn()
-  updatedAt?: Date = new Date();
+  updatedAt?: Date = new Date()
 }

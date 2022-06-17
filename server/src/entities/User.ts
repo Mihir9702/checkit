@@ -1,86 +1,87 @@
+/* eslint-disable no-use-before-define */
 import {
   Column,
   Entity,
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
-  PrimaryGeneratedColumn,
-} from "typeorm";
-import { Field, ObjectType } from "type-graphql";
-import { Post } from "./Post";
-import { Comment } from "./Comment";
+  PrimaryGeneratedColumn
+} from 'typeorm'
+import { Field, ObjectType } from 'type-graphql'
+import { Post } from './Post'
+import { Comment } from './Comment'
 
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: number
 
   @Field()
-  @Column({ type: "text" })
-  username?: string;
+  @Column({ type: 'text' })
+  username?: string
 
-  @Column({ type: "text" })
-  password!: string;
-
-  @Field()
-  @Column({ type: "text" })
-  email?: string;
+  @Column({ type: 'text' })
+  password!: string
 
   @Field()
-  @Column({ type: "number" })
-  userId!: number;
+  @Column({ type: 'text' })
+  email?: string
 
   @Field()
-  @Column({ type: "text" })
-  displayName!: string;
+  @Column({ type: 'number' })
+  userId!: number
 
   @Field()
-  @Column({ type: "text" })
-  bio?: string;
+  @Column({ type: 'text' })
+  displayName!: string
 
   @Field()
-  @Column({ type: "number" })
-  points!: number;
+  @Column({ type: 'text' })
+  bio?: string
 
   @Field()
-  @Column({ type: "text" })
-  profilePic!: string;
+  @Column({ type: 'number' })
+  points!: number
 
   @Field()
-  @Column()
-  posts?: Post[];
+  @Column({ type: 'text' })
+  profilePic!: string
 
   @Field()
   @Column()
-  comments?: Comment[];
+  posts?: Post[]
 
   @Field()
   @Column()
-  upVotes?: User[];
+  comments?: Comment[]
 
   @Field()
   @Column()
-  downVotes?: User[];
+  upVotes?: User[]
 
   @Field()
   @Column()
-  followers?: User[];
+  downVotes?: User[]
 
   @Field()
   @Column()
-  following?: User[];
+  followers?: User[]
 
   @Field()
   @Column()
-  savedPosts?: Post[];
+  following?: User[]
+
+  @Field()
+  @Column()
+  savedPosts?: Post[]
 
   @Field(() => String)
   @CreateDateColumn()
-  createdAt?: Date = new Date();
+  createdAt?: Date = new Date()
 
   @Field(() => String)
   @UpdateDateColumn()
-  updatedAt?: Date = new Date();
+  updatedAt?: Date = new Date()
 }
