@@ -9,8 +9,9 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module'
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'prettier'],
   rules: {
-    indent: 'off'
+    '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/no-use-before-define': 'off'
   }
 }

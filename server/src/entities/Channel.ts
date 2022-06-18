@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 import {
   Column,
   Entity,
@@ -13,14 +12,14 @@ import { Post } from './Post'
 
 @ObjectType()
 @Entity()
-export class Comment extends BaseEntity {
+export class Channel extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
   id!: number
 
   @Field()
   @Column({ type: 'text' })
-  text!: string
+  name!: string
 
   @Field()
   @Column()
@@ -28,19 +27,23 @@ export class Comment extends BaseEntity {
 
   @Field()
   @Column()
-  post!: Post
+  admins?: User[]
 
   @Field()
   @Column()
-  upVotes!: User[]
+  posts?: Post[]
 
   @Field()
   @Column()
-  downVotes!: User[]
+  members!: User[]
 
   @Field()
   @Column()
-  comments?: Comment[]
+  upVotes?: User[]
+
+  @Field()
+  @Column()
+  downVotes?: User[]
 
   @Field(() => String)
   @CreateDateColumn()

@@ -11,7 +11,7 @@ import {
 import { MyContext } from '../types'
 import { hash, genSalt, compare } from 'bcryptjs'
 import { User } from '../entities/User'
-import { generateNumber } from '../helpers/rand'
+import { generateNumber } from '../utils'
 import {
   adjectives,
   colors,

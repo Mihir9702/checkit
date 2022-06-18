@@ -8,7 +8,7 @@ export default new DataSource({
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: 'checkit',
-  synchronize: true,
+  // synchronize: true,
   logging: true,
   entities: [path.join(__dirname, 'entities/**/*.ts')]
 })
