@@ -16,9 +16,6 @@ import { Post } from '../entities/Post'
 @InputType()
 class PostInput {
   @Field()
-  owner!: User
-
-  @Field()
   title!: string
 
   @Field()
@@ -60,7 +57,80 @@ export class PostResolver {
     return posts
   }
 
-  // * Create a new post
+  @Mutation(() => Post)
+  @UseMiddleware(isAuth)
+  async upVotePost(
+    @Arg('id') id: number,
+    @Ctx() { req }: MyContext
+  ): Promise<Post> {
+    const user = await User.findOne({ where: { id: req.session.userId } })
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    const post = await Post.findOne({ where: { id } })
+
+    if (!post) {
+      throw new Error('Post not found')
+    }
+
+    if (post && post.upVotes) {
+      if (post.upVotes.find((user) => user.id === req.session.userId)) {
+        throw new Error('You already liked this post')
+      }
+
+      post.upVotes.push(user)
+      await post.save()
+    }
+
+    return post
+  }
+
+  @Mutation(() => Post)
+  @UseMiddleware(isAuth)
+  async downVotePost(
+    @Arg('id') id: number,
+    @Ctx() { req }: MyContext
+  ): Promise<Post> {
+    const user = await User.findOne({ where: { id: req.session.userId } })
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    const post = await Post.findOne({ where: { id } })
+
+    if (!post) {
+      throw new Error('Post not found')
+    }
+
+    if (
+      post.upVotes &&
+      post.upVotes.find((user) => user.id === req.session.userId)
+    ) {
+      post.upVotes = post.upVotes.filter(
+        (user) => user.id !== req.session.userId
+      )
+      await post.save()
+    }
+
+    if (
+      post.downVotes &&
+      post.downVotes.find((user) => user.id === req.session.userId)
+    ) {
+      post.downVotes = post.downVotes.filter(
+        (user) => user.id !== req.session.userId
+      )
+      await post.save()
+    }
+
+    post.downVotes?.push(user)
+    await post.save()
+
+    return post
+  }
+
   @Mutation(() => Post)
   @UseMiddleware(isAuth)
   async createPost(

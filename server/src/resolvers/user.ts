@@ -1,4 +1,3 @@
-/* eslint-disable space-before-function-paren */
 import {
   Arg,
   Ctx,
@@ -30,6 +29,12 @@ class UserInput {
 
   @Field()
   password!: string
+
+  @Field()
+  displayName?: string
+
+  @Field()
+  bio?: string
 }
 
 @Resolver()
@@ -120,36 +125,35 @@ export class UserResolver {
     return true
   }
 
-  // * display name
   @Mutation(() => User)
   @UseMiddleware(isAuth)
-  async updateDisplayName(
-    @Arg('displayName') displayName: string,
-    @Ctx() { req }: MyContext
+  async updateUser(
+    @Ctx() { req }: MyContext,
+    @Arg('params') params: UserInput
   ): Promise<User> {
-    const user = await User.findOne({ where: { id: req.session.userId } })
+    const user = await User.findOne({ where: { userId: req.session.userId } })
 
-    if (!user) throw new Error('User not found')
+    if (!user) {
+      throw new Error('User not found')
+    }
 
-    user.displayName = displayName
+    if (params.bio) {
+      user.bio = params.bio
+    }
 
-    await user.save()
+    if (params.displayName) {
+      user.displayName = params.displayName
+    }
 
-    return user
-  }
+    if (params.username) {
+      validate.username(params.username)
+      user.username = params.username
+    }
 
-  // * bio
-  @Mutation(() => User)
-  @UseMiddleware(isAuth)
-  async updateBio(
-    @Arg('bio') bio: string,
-    @Ctx() { req }: MyContext
-  ): Promise<User> {
-    const user = await User.findOne({ where: { id: req.session.userId } })
-
-    if (!user) throw new Error('User not found')
-
-    user.bio = bio
+    if (params.email) {
+      validate.email(params.email)
+      user.email = params.email
+    }
 
     await user.save()
 
