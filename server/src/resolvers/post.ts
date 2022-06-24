@@ -75,14 +75,28 @@ export class PostResolver {
       throw new Error('Post not found')
     }
 
-    if (post && post.upVotes) {
-      if (post.upVotes.find((user) => user.id === req.session.userId)) {
-        throw new Error('You already liked this post')
-      }
-
-      post.upVotes.push(user)
+    if (
+      post.upVotes &&
+      post.upVotes.find((user) => user.id === req.session.userId)
+    ) {
+      post.upVotes = post.upVotes.filter(
+        (user) => user.id !== req.session.userId
+      )
       await post.save()
     }
+
+    if (
+      post.downVotes &&
+      post.downVotes.find((user) => user.id === req.session.userId)
+    ) {
+      post.downVotes = post.downVotes.filter(
+        (user) => user.id !== req.session.userId
+      )
+      await post.save()
+    }
+
+    post.upVotes?.push(user)
+    await post.save()
 
     return post
   }
