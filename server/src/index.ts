@@ -4,9 +4,9 @@ import path from 'path'
 import express from 'express'
 import db from './connect'
 import cors from 'cors'
-import Redis from 'ioredis'
-import connectRedis from 'connect-redis'
 import session from 'express-session'
+import { createClient } from 'redis'
+import connectRedis from 'connect-redis'
 import { __prod__, COOKIE } from './utils'
 import { ApolloServer } from 'apollo-server-express'
 import { buildSchema } from 'type-graphql'
@@ -20,8 +20,10 @@ const main = async () => {
 
   const app = express()
 
-  const RedisStore = connectRedis(express)
-  const redis = new Redis(process.env.REDIS_URL!)
+  const RedisStore = connectRedis(session)
+  const RedisClient = createClient()
+
+  await RedisClient.connect()
 
   app.set('trust proxy', __prod__)
 
@@ -35,7 +37,11 @@ const main = async () => {
   app.use(
     session({
       name: COOKIE,
-      store: new RedisStore({ client: redis, disableTouch: true }),
+      store: new RedisStore({
+        client: RedisClient,
+        disableTouch: true,
+        disableTTL: true
+      }),
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
         httpOnly: true,
@@ -53,7 +59,7 @@ const main = async () => {
       resolvers: [path.join(__dirname, '/resolvers/*.ts')],
       validate: false
     }),
-    context: ({ req, res }): MyContext => ({ req, res, redis }),
+    context: ({ req, res }): MyContext => ({ req, res }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground]
   })
 

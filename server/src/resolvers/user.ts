@@ -11,7 +11,7 @@ import {
 import { MyContext } from '../types'
 import { hash, genSalt, compare } from 'bcryptjs'
 import { User } from '../entities/User'
-import { generateNumber } from '../utils'
+import { generateNumber, validate } from '../utils'
 import {
   adjectives,
   colors,
@@ -21,9 +21,12 @@ import {
 import { isAuth } from '../middleware/isAuth'
 
 @InputType()
-class Input {
+class UserInput {
   @Field()
   username!: string
+
+  @Field()
+  email!: string
 
   @Field()
   password!: string
@@ -34,31 +37,32 @@ export class UserResolver {
   // * signup
   @Mutation(() => User)
   async signup(
-    @Arg('params') params: Input,
+    @Arg('params') params: UserInput,
     @Ctx() { req }: MyContext
   ): Promise<User> {
-    // Find if user already exists
     const foundUser = await User.findOne({
       where: { username: params.username.toLowerCase() }
     })
 
     if (foundUser) throw new Error('Username already taken')
 
-    if (params.username.length < 2) {
-      throw new Error('Username must be at least 2 characters')
-    }
+    const {
+      username: usernameValidation,
+      email: emailValidation,
+      password: passwordValidation
+    } = validate
 
-    if (params.password.length < 4) {
-      throw new Error('Password must be at least 4 characters')
-    }
+    usernameValidation(params.username)
+    emailValidation(params.email)
+    passwordValidation(params.password)
 
-    const hashedPassword = await hash(params.password, await genSalt(10))
+    const hashedPassword = await hash(params.password, await genSalt(11))
 
     const randomId = generateNumber(4)
 
     const config: Config = {
       dictionaries: [adjectives, colors],
-      separator: '-',
+      separator: '_',
       length: 2
     }
 
@@ -71,13 +75,15 @@ export class UserResolver {
       displayName: randomName
     }).save()
 
+    req.session.userId = user.id
+
     return user
   }
 
   // * login
   @Mutation(() => User)
   async login(
-    @Arg('params') params: Input,
+    @Arg('params') params: UserInput,
     @Ctx() { req }: MyContext
   ): Promise<User> {
     if (!params.username) throw new Error('Username not provided')
@@ -91,6 +97,8 @@ export class UserResolver {
 
     if (!valid) throw new Error('Invalid username or password')
 
+    req.session.userId = user.id
+
     return user
   }
 
@@ -98,6 +106,51 @@ export class UserResolver {
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async logout(@Ctx() { req }: MyContext): Promise<boolean> {
+    if (!req.session.userId) {
+      throw new Error('Not authenticated')
+    }
+
+    const handleError = (err: Error) => {
+      if (err) throw new Error('Error logging out')
+      return false
+    }
+
+    req.session.destroy(handleError)
+
     return true
+  }
+
+  @Mutation(() => User)
+  @UseMiddleware(isAuth)
+  async updateDisplayName(
+    @Arg('displayName') displayName: string,
+    @Ctx() { req }: MyContext
+  ): Promise<User> {
+    const user = await User.findOne({ where: { id: req.session.userId } })
+
+    if (!user) throw new Error('User not found')
+
+    user.displayName = displayName
+
+    await user.save()
+
+    return user
+  }
+
+  @Mutation(() => User)
+  @UseMiddleware(isAuth)
+  async updateBio(
+    @Arg('bio') bio: string,
+    @Ctx() { req }: MyContext
+  ): Promise<User> {
+    const user = await User.findOne({ where: { id: req.session.userId } })
+
+    if (!user) throw new Error('User not found')
+
+    user.bio = bio
+
+    await user.save()
+
+    return user
   }
 }

@@ -5,8 +5,8 @@ import {
   randomNumber,
   randomizeArray
 } from './rand'
-
 import { __prod__, COOKIE } from './constants'
+import { validate } from './validate'
 
 export {
   randomString,
@@ -15,5 +15,6 @@ export {
   randomNumber,
   randomizeArray,
   __prod__,
-  COOKIE
+  COOKIE,
+  validate
 }
