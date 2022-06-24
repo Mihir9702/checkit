@@ -120,6 +120,7 @@ export class UserResolver {
     return true
   }
 
+  // * display name
   @Mutation(() => User)
   @UseMiddleware(isAuth)
   async updateDisplayName(
@@ -137,6 +138,7 @@ export class UserResolver {
     return user
   }
 
+  // * bio
   @Mutation(() => User)
   @UseMiddleware(isAuth)
   async updateBio(

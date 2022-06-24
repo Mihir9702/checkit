@@ -19,7 +19,7 @@ export class Post extends BaseEntity {
 
   @Field()
   @Column()
-  owner!: User
+  owner!: number
 
   @Field()
   @Column({ type: 'text' })
